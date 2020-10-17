@@ -1,0 +1,66 @@
+Milestone/Methodology
+========================================================================================================================
+Experiment 1 We are looking for the following performance from different TCP variants:
+1. Which TCP variant(s) are able to get higher average throughput?
+2. Which has the lowest average latency? Which has the fewest drops?
+3. Is there an overall "best" TCP variant in this experiment, or does the "best" variant vary depending on other circumstances?
+
+Terminology Clarification:
+1. Average throughput
+There are several ways to measure throughput:
+- We aim to measure goodput(the total number of TCP packet got received by and dequeued by TCP sink during the simulation),
+  which is bytes received / time
+- We aim to measure the sending rate, which is bytes sent / time
+- We aim to find the average for the entire experiment by taking the total bytes (sent/received) divided by the total time
+  that the flow was running
+- We aim to look for averages over 1-second (or whatever unit of time makes sense) windows to understand how the
+  send/receive rates vary over time
+
+2.1 Average latency
+Measure latency in terms of the round-trip time (RTT) for each successful data/ack pair, then find the average over those samples.
+(Recall that RTT can't be sampled accurately when a packet is dropped.)
+2.2 Drops(any packets that are lost during the transmission N2->N3->N4)
+We focus on the packet drop rate, not the absolute number of packets. The rate is the number of dropped packets over
+the total number of sent packets.
+
+We will use Constant Bit Rate (CBR) flow, which occupies a certain amount of bandwidth. In this case, CBR is the
+independent variable(IV), while the performance of TCP variants is the dependent variable(DV). Other network properties
+(delay, queue type, queue size, and so on) are controlled variables, which remains unchanged. So we will change the CBR
+traffic rate, then observe the corresponding changes of TCP's throughput, drop rate, and delay.
+
+Our methods to generalize TCP behavior outside of the simulated environment by:
+-  Increasing the CBR gradually from 1 Mbps to 10Mbps
+-  Decreasing the CBR gradually from 10Mbps to 1 Mbps
+-  Introducing CBR flow after TCP becomes stable
+-  Modifying the packet size
+
+We will run multiple experiments with different time offsets in the before and after categories. We need >=10 experiments
+with (randomly) selected time offsets for each CBR rate.
+========================================================================================================================
+Experiment 2 We try to analyze the fairness between different TCP variants:
+1. Are the different combinations of variants fair to each other?
+2. Are there combinations that are unfair, and if so, why is the combination unfair?
+
+The way we will achieve this is by sending two TCP flows and one CBR flow to the network.
+We will observe the behavior of the flows and identify if the TCP flows are fair to each other and to which degree.
+The different combinations of TCP variants that we expect to cover for this experiment to look for fairness are as follows:
+-  Reno/Reno
+-  NewReno/Reno
+-  Vegas/Vegas
+-  NewReno/Vegas
+
+As an extension of Experiment 1, here we compare the average throughput, packet loss rate, and latency of each TCP flow
+as a function of the bandwidth used by the CBR flow to determine the fairness of the protocols to one another.
+We need to vary the relative time when tcp1 and tcp2 are started and conduct around 10+ experiments for each combination of TCPs.
+Again, for this experiment we can have the CBR flow start before the TCPs. We will check for mean and std deviation.
+========================================================================================================================
+Experiment 3: Influence of Queuing
+To analyze the performance of different variants when it implements the different queuing strategies like Drop-tail and
+Random Early Drop(RED). Setup the same topology(N1->N4: TCP flow, N5->N6: CBR over UDP). Wait until TCP flow is stabilized
+and then start CBR. Also try starting CBR before TCP, both at the same time and TCP before CBR. Analyze the performance
+of the TCP variants over different queuing strategies.  A good idea would be to look at time series graphs from individual
+experiments to make sure that our experiment outcomes make sense.
+========================================================================================================================
+Thanks for the advice given by teaching assistant Poorva Sonparote sonparote.p@northeastern.edu
+
+
